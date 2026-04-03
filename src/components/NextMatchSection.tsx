@@ -30,7 +30,7 @@ const NextMatchSection = () => {
               <p className="text-xs text-muted-foreground">SAT 21 JAN</p>
             </div>
             <button className="bg-primary text-primary-foreground font-heading text-xs tracking-wider px-5 py-2 hover:bg-gold-dark transition-colors">
-              GET TICKETS
+              VIEW MATCH
             </button>
           </div>
 
