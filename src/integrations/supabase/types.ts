@@ -14,7 +14,95 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      player_stats: {
+        Row: {
+          created_at: string
+          draws: number
+          goals_against: number
+          goals_for: number
+          id: string
+          losses: number
+          matches: number
+          motm: number
+          player_id: string
+          red_cards: number
+          updated_at: string
+          wins: number
+          yellow_cards: number
+        }
+        Insert: {
+          created_at?: string
+          draws?: number
+          goals_against?: number
+          goals_for?: number
+          id?: string
+          losses?: number
+          matches?: number
+          motm?: number
+          player_id: string
+          red_cards?: number
+          updated_at?: string
+          wins?: number
+          yellow_cards?: number
+        }
+        Update: {
+          created_at?: string
+          draws?: number
+          goals_against?: number
+          goals_for?: number
+          id?: string
+          losses?: number
+          matches?: number
+          motm?: number
+          player_id?: string
+          red_cards?: number
+          updated_at?: string
+          wins?: number
+          yellow_cards?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_stats_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: true
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      players: {
+        Row: {
+          age: number
+          created_at: string
+          id: string
+          name: string
+          photo_url: string | null
+          position: string | null
+          team: Database["public"]["Enums"]["player_team"]
+          updated_at: string
+        }
+        Insert: {
+          age: number
+          created_at?: string
+          id?: string
+          name: string
+          photo_url?: string | null
+          position?: string | null
+          team?: Database["public"]["Enums"]["player_team"]
+          updated_at?: string
+        }
+        Update: {
+          age?: number
+          created_at?: string
+          id?: string
+          name?: string
+          photo_url?: string | null
+          position?: string | null
+          team?: Database["public"]["Enums"]["player_team"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +111,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      player_team: "main_team" | "academy_team" | "youth_team"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +238,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      player_team: ["main_team", "academy_team", "youth_team"],
+    },
   },
 } as const
