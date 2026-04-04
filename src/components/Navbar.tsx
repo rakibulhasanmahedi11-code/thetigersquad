@@ -2,7 +2,15 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import tigerLogo from "@/assets/tiger-logo.png";
 
-const navItems = ["PLAYERS", "NEWS", "FIXTURES", "CLUB", "SHOP", "TICKET"];
+const navItems = [
+  { label: "PLAYERS", href: "#players" },
+  { label: "TOURNAMENT", href: "#tournament" },
+  { label: "RANKING", href: "#ranking" },
+  { label: "CLUB", href: "#club-info" },
+  { label: "RULES", href: "#rules" },
+  { label: "NEWS", href: "#news" },
+  { label: "LOGIN", href: "#login" },
+];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,18 +18,18 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4 flex items-center justify-between h-16">
-        <div className="flex items-center gap-3">
+        <a href="/" className="flex items-center gap-3">
           <img src={tigerLogo} alt="The Tiger Squad" className="w-10 h-10" />
           <div>
             <h1 className="font-heading text-sm font-bold tracking-wider text-foreground">THE TIGER SQUAD</h1>
             <p className="text-[10px] text-muted-foreground tracking-widest">FOOTBALL CLUB</p>
           </div>
-        </div>
+        </a>
 
         <div className="hidden md:flex items-center gap-8">
           {navItems.map((item) => (
-            <a key={item} href={`#${item.toLowerCase()}`} className="font-heading text-sm tracking-wider text-muted-foreground hover:text-primary transition-colors">
-              {item}
+            <a key={item.label} href={item.href} className="font-heading text-sm tracking-wider text-muted-foreground hover:text-primary transition-colors">
+              {item.label}
             </a>
           ))}
         </div>
@@ -34,8 +42,8 @@ const Navbar = () => {
       {isOpen && (
         <div className="md:hidden bg-card border-t border-border">
           {navItems.map((item) => (
-            <a key={item} href={`#${item.toLowerCase()}`} className="block px-6 py-3 font-heading text-sm tracking-wider text-muted-foreground hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>
-              {item}
+            <a key={item.label} href={item.href} className="block px-6 py-3 font-heading text-sm tracking-wider text-muted-foreground hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>
+              {item.label}
             </a>
           ))}
         </div>

@@ -1,13 +1,14 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import StatsSection from "@/components/StatsSection";
-import NextMatchSection from "@/components/NextMatchSection";
+import PlayerListSection from "@/components/PlayerListSection";
+import TournamentSection from "@/components/TournamentSection";
+import CommunityTournamentSection from "@/components/CommunityTournamentSection";
+import OverallRankingSection from "@/components/OverallRankingSection";
+import ClubInfoSection from "@/components/ClubInfoSection";
+import ClubRulesSection from "@/components/ClubRulesSection";
 import LatestNewsSection from "@/components/LatestNewsSection";
-import PlayersSection from "@/components/PlayersSection";
-import FixturesSection from "@/components/FixturesSection";
-import TrophySection from "@/components/TrophySection";
-import StoreSection from "@/components/StoreSection";
-import StadiumSection from "@/components/StadiumSection";
+import LoginSection from "@/components/LoginSection";
 import FooterSection from "@/components/FooterSection";
 
 const Index = () => {
@@ -16,13 +17,14 @@ const Index = () => {
       <Navbar />
       <HeroSection />
       <StatsSection />
-      <NextMatchSection />
+      <PlayerListSection />
+      <TournamentSection />
+      <CommunityTournamentSection />
+      <OverallRankingSection />
+      <ClubInfoSection />
+      <ClubRulesSection />
       <LatestNewsSection />
-      <PlayersSection />
-      <FixturesSection />
-      <TrophySection />
-      <StoreSection />
-      <StadiumSection />
+      <LoginSection />
       <FooterSection />
     </div>
   );
