@@ -17,7 +17,7 @@ const teamDisplayName: Record<string, string> = {
 };
 
 const PlayerListSection = () => {
-  const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
+  const [selectedTeam, setSelectedTeam] = useState<"main_team" | "academy_team" | "youth_team" | null>(null);
   const navigate = useNavigate();
 
   const { data: players = [], isLoading } = useQuery({
