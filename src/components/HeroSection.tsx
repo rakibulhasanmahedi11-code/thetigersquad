@@ -3,14 +3,14 @@ import stadiumHero from "@/assets/stadium-hero.jpg";
 
 const HeroSection = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-screen flex items-start overflow-hidden">
       <div className="absolute inset-0">
         <img src={stadiumHero} alt="Stadium" className="w-full h-full object-cover" width={1920} height={1080} />
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/40" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/50" />
       </div>
 
-      <div className="relative z-10 container mx-auto px-4 pt-16">
+      <div className="relative z-10 container mx-auto px-4 pt-24 md:pt-28">
         <div className="max-w-2xl">
           <h2 className="font-heading text-6xl md:text-8xl lg:text-9xl font-black uppercase leading-none">
             <span className="text-foreground">THE</span>
@@ -27,9 +27,9 @@ const HeroSection = () => {
               <Play size={16} />
               WATCH HIGHLIGHTS
             </button>
-            <button className="bg-card border border-border text-foreground font-heading text-sm tracking-wider px-6 py-3 hover:border-primary transition-colors">
-              BUY TICKETS
-            </button>
+            <a href="/tournament" className="bg-card border border-border text-foreground font-heading text-sm tracking-wider px-6 py-3 hover:border-primary transition-colors">
+              VIEW MATCHES
+            </a>
           </div>
         </div>
       </div>
