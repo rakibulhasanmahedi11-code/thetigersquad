@@ -14,6 +14,80 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_permissions: {
+        Row: {
+          admin_id: string
+          created_at: string
+          download_system: boolean
+          draw_system: boolean
+          id: string
+          player_control: boolean
+          result_submit: boolean
+          tournament_control: boolean
+          updated_at: string
+        }
+        Insert: {
+          admin_id: string
+          created_at?: string
+          download_system?: boolean
+          draw_system?: boolean
+          id?: string
+          player_control?: boolean
+          result_submit?: boolean
+          tournament_control?: boolean
+          updated_at?: string
+        }
+        Update: {
+          admin_id?: string
+          created_at?: string
+          download_system?: boolean
+          draw_system?: boolean
+          id?: string
+          player_control?: boolean
+          result_submit?: boolean
+          tournament_control?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_permissions_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: true
+            referencedRelation: "club_admins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_admins: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          name?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       player_stats: {
         Row: {
           created_at: string
@@ -108,7 +182,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_main_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       player_team: "main_team" | "academy_team" | "youth_team"
