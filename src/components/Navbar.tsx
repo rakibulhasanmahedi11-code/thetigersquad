@@ -29,17 +29,11 @@ const Navbar = () => {
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
-          {navItems.map((item) =>
-            item.href.startsWith("/#") ? (
-              <a key={item.label} href={item.href} className="font-heading text-sm tracking-wider text-muted-foreground hover:text-primary transition-colors">
-                {item.label}
-              </a>
-            ) : (
-              <Link key={item.label} to={item.href} className="font-heading text-sm tracking-wider text-muted-foreground hover:text-primary transition-colors">
-                {item.label}
-              </Link>
-            )
-          )}
+          {navItems.map((item) => (
+            <Link key={item.label} to={item.href} className="font-heading text-sm tracking-wider text-muted-foreground hover:text-primary transition-colors">
+              {item.label}
+            </Link>
+          ))}
         </div>
 
         <button onClick={() => setIsOpen(!isOpen)} className="md:hidden text-foreground">
@@ -49,17 +43,11 @@ const Navbar = () => {
 
       {isOpen && (
         <div className="md:hidden bg-card border-t border-border">
-          {navItems.map((item) =>
-            item.href.startsWith("/#") ? (
-              <a key={item.label} href={item.href} className="block px-6 py-3 font-heading text-sm tracking-wider text-muted-foreground hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>
-                {item.label}
-              </a>
-            ) : (
-              <Link key={item.label} to={item.href} className="block px-6 py-3 font-heading text-sm tracking-wider text-muted-foreground hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>
-                {item.label}
-              </Link>
-            )
-          )}
+          {navItems.map((item) => (
+            <Link key={item.label} to={item.href} className="block px-6 py-3 font-heading text-sm tracking-wider text-muted-foreground hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>
+              {item.label}
+            </Link>
+          ))}
         </div>
       )}
     </nav>
