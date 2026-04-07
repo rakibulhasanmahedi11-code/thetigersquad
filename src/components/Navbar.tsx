@@ -6,11 +6,11 @@ import tigerLogo from "@/assets/tiger-logo.png";
 const navItems = [
   { label: "PLAYERS", href: "/players" },
   { label: "TOURNAMENT", href: "/tournament" },
-  { label: "RANKING", href: "/#ranking" },
+  { label: "RANKING", href: "/ranking" },
   { label: "CLUB", href: "/club-info" },
   { label: "RULES", href: "/rules" },
   { label: "NEWS", href: "/news" },
-  { label: "LIVE DRAW", href: "/live-draw" },
+  { label: "DRAW", href: "/live-draw" },
   { label: "ADMIN", href: "/admin" },
 ];
 

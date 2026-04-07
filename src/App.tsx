@@ -16,6 +16,7 @@ import MainAdminLogin from "./pages/MainAdminLogin.tsx";
 import ClubAdminLogin from "./pages/ClubAdminLogin.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
 import LiveDrawPage from "./pages/LiveDrawPage.tsx";
+import RankingPage from "./pages/RankingPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/admin/club-login" element={<ClubAdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/live-draw" element={<LiveDrawPage />} />
+            <Route path="/ranking" element={<RankingPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
