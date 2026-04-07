@@ -1,3 +1,5 @@
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import OverallRankingSection from "@/components/OverallRankingSection";
@@ -5,6 +7,20 @@ import LiveDrawSection from "@/components/LiveDrawSection";
 import FooterSection from "@/components/FooterSection";
 
 const Index = () => {
+  const { data: clubInfo = {} } = useQuery({
+    queryKey: ["club-info-home"],
+    queryFn: async () => {
+      const { data } = await supabase.from("club_info").select("*");
+      const map: Record<string, string> = {};
+      data?.forEach((r: any) => { map[r.key] = r.value || ""; });
+      return map;
+    },
+  });
+
+  const pageLink = clubInfo.page_link || "";
+  const groupLink = clubInfo.group_link || "";
+  const clubCreated = clubInfo.club_created || "2024";
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -22,15 +38,27 @@ const Index = () => {
             <div className="bg-card border border-border rounded-lg p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Page Link</span>
-                <a href="/" className="text-sm text-primary hover:underline">thetigersquad.lovable.app</a>
+                {pageLink ? (
+                  <a href={pageLink.startsWith("http") ? pageLink : `https://${pageLink}`} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
+                    {pageLink}
+                  </a>
+                ) : (
+                  <span className="text-sm text-muted-foreground">No Link Available</span>
+                )}
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Group Link</span>
-                <span className="text-sm text-primary">Coming Soon</span>
+                {groupLink ? (
+                  <a href={groupLink.startsWith("http") ? groupLink : `https://${groupLink}`} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
+                    Join Group
+                  </a>
+                ) : (
+                  <span className="text-sm text-muted-foreground">No Link Available</span>
+                )}
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Club Created</span>
-                <span className="text-sm text-foreground font-bold">2024</span>
+                <span className="text-sm text-foreground font-bold">{clubCreated}</span>
               </div>
             </div>
             <div className="bg-card border border-border rounded-lg p-6 space-y-4">
