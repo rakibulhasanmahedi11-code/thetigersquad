@@ -29,16 +29,26 @@ const ClubInfoPage = () => {
                 <Globe className="w-5 h-5 text-primary" />
                 <div>
                   <p className="text-xs text-muted-foreground">Page Link</p>
-                  <a href={`https://${clubInfo.page_link || "thetigersquad.lovable.app"}`} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
-                    {clubInfo.page_link || "thetigersquad.lovable.app"}
-                  </a>
+                  {clubInfo.page_link ? (
+                    <a href={clubInfo.page_link.startsWith("http") ? clubInfo.page_link : `https://${clubInfo.page_link}`} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
+                      {clubInfo.page_link}
+                    </a>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">No Link Available</span>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Users className="w-5 h-5 text-primary" />
                 <div>
                   <p className="text-xs text-muted-foreground">Group Link</p>
-                  <p className="text-sm text-foreground">{clubInfo.group_link || "Coming Soon"}</p>
+                  {clubInfo.group_link ? (
+                    <a href={clubInfo.group_link.startsWith("http") ? clubInfo.group_link : `https://${clubInfo.group_link}`} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
+                      Join Group
+                    </a>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">No Link Available</span>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-3">

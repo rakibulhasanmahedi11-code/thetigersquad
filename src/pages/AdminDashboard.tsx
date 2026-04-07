@@ -54,6 +54,83 @@ interface RuleItem {
   content_bn: string | null; category: string; pinned: boolean; sort_order: number;
 }
 
+// Logo Management Component
+const LogoManagement = ({ toast }: { toast: any }) => {
+  const logoTypes = ["Website Logo", "Club Logo", "Main Team Logo", "Academy Team Logo", "Youth Team Logo"];
+  const [logos, setLogos] = useState<Record<string, string>>({});
+  const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+
+  useEffect(() => {
+    const saved = localStorage.getItem("clubLogos");
+    if (saved) setLogos(JSON.parse(saved));
+  }, []);
+
+  const handleLogoUpload = (name: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { toast({ title: "File size must be under 2MB", variant: "destructive" }); return; }
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) { toast({ title: "Only JPG/PNG/WEBP allowed", variant: "destructive" }); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const url = reader.result as string;
+      setLogos(prev => {
+        const updated = { ...prev, [name]: url };
+        localStorage.setItem("clubLogos", JSON.stringify(updated));
+        return updated;
+      });
+      toast({ title: `${name} uploaded!` });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeLogo = (name: string) => {
+    setLogos(prev => {
+      const updated = { ...prev };
+      delete updated[name];
+      localStorage.setItem("clubLogos", JSON.stringify(updated));
+      return updated;
+    });
+    if (inputRefs.current[name]) inputRefs.current[name]!.value = "";
+    toast({ title: `${name} removed` });
+  };
+
+  return (
+    <div className="space-y-6">
+      <h2 className="font-heading text-xl font-bold text-foreground">LOGO MANAGEMENT</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {logoTypes.map(name => (
+          <div
+            key={name}
+            className="bg-card border border-border rounded-lg p-4 text-center cursor-pointer hover:border-primary transition-colors"
+            onClick={() => inputRefs.current[name]?.click()}
+          >
+            <input
+              ref={el => { inputRefs.current[name] = el; }}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={e => handleLogoUpload(name, e)}
+            />
+            {logos[name] ? (
+              <div className="relative inline-block">
+                <img src={logos[name]} alt={name} className="w-20 h-20 mx-auto object-contain rounded-lg mb-2" />
+                <button
+                  onClick={e => { e.stopPropagation(); removeLogo(name); }}
+                  className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold"
+                >×</button>
+              </div>
+            ) : (
+              <Upload className="w-10 h-10 mx-auto text-muted-foreground mb-2" />
+            )}
+            <p className="font-heading text-sm font-bold text-foreground">{name}</p>
+            <p className="text-xs text-muted-foreground mt-1">{logos[name] ? "Click to replace" : "Click to upload"}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const AdminDashboard = () => {
   const { user, loading, isMainAdmin, signOut } = useAuth();
   const navigate = useNavigate();
@@ -175,7 +252,7 @@ const AdminDashboard = () => {
   const rejectAdmin = async (id: string) => { await supabase.from("club_admins").update({ status: "rejected" }).eq("id", id); toast({ title: "Rejected" }); loadClubAdmins(); };
   const deleteAdmin = async (id: string) => { await supabase.from("club_admins").delete().eq("id", id); toast({ title: "Deleted" }); loadClubAdmins(); };
   const togglePermission = async (adminId: string, field: string, value: boolean) => {
-    await supabase.from("admin_permissions").update({ [field]: value }).eq("admin_id", adminId);
+    await supabase.from("admin_permissions").update({ [field]: value } as any).eq("admin_id", adminId);
     loadClubAdmins();
   };
 
@@ -183,7 +260,7 @@ const AdminDashboard = () => {
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 10 * 1024 * 1024) { toast({ title: "Max 10MB", variant: "destructive" }); return; }
+    if (file.size > 2 * 1024 * 1024) { toast({ title: "File size must be under 2MB", variant: "destructive" }); return; }
     if (!["image/jpeg", "image/png", "image/webp", "image/jpg"].includes(file.type)) {
       toast({ title: "Only JPG/PNG/WEBP allowed", variant: "destructive" }); return;
     }
@@ -267,8 +344,9 @@ const AdminDashboard = () => {
   // Tournament CRUD
   const resetTournamentForm = () => { setTName(""); setTType("league"); setTSeason("S1"); setTYear(new Date().getFullYear()); setEditingTournament(null); };
   const addTournament = async () => {
-    if (!tName) return;
-    await supabase.from("tournaments").insert({ name: tName, type: tType, season: tSeason, year: tYear });
+    if (!tName) { toast({ title: "Tournament name is required", variant: "destructive" }); return; }
+    const { error } = await supabase.from("tournaments").insert({ name: tName, type: tType, season: tSeason, year: tYear });
+    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
     toast({ title: "Tournament Created!" }); resetTournamentForm(); loadTournaments();
   };
   const updateTournament = async (id: string) => {
@@ -462,7 +540,7 @@ const AdminDashboard = () => {
                 </div>
                 {/* Photo upload */}
                 <div className="mt-3">
-                  <label className="text-xs text-muted-foreground mb-1 block">Player Photo (JPG/PNG/WEBP, max 10MB)</label>
+                  <label className="text-xs text-muted-foreground mb-1 block">Player Photo (JPG/PNG/WEBP, max 2MB)</label>
                   <div className="flex items-center gap-4">
                     <input ref={photoInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePhotoSelect} className="text-sm text-foreground" />
                     {playerPhotoPreview && (
@@ -802,18 +880,7 @@ const AdminDashboard = () => {
 
           {/* ===== LOGOS ===== */}
           {activeTab === "logos" && isMainAdmin && (
-            <div className="space-y-6">
-              <h2 className="font-heading text-xl font-bold text-foreground">LOGO MANAGEMENT</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {["Website Logo", "Club Logo", "Main Team Logo", "Academy Team Logo", "Youth Team Logo", "TTS League Logo", "TTS Champions League Logo", "TTS Trophy Logo"].map(name => (
-                  <div key={name} className="bg-card border border-border rounded-lg p-4 text-center">
-                    <Image className="w-10 h-10 mx-auto text-muted-foreground mb-2" />
-                    <p className="font-heading text-sm font-bold text-foreground">{name}</p>
-                    <p className="text-xs text-muted-foreground mt-1">Upload feature coming soon</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <LogoManagement toast={toast} />
           )}
 
           {/* ===== FIXTURE (Inactive) ===== */}
