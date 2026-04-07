@@ -183,7 +183,7 @@ const AdminDashboard = () => {
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 10 * 1024 * 1024) { toast({ title: "Max 10MB", variant: "destructive" }); return; }
+    if (file.size > 2 * 1024 * 1024) { toast({ title: "File size must be under 2MB", variant: "destructive" }); return; }
     if (!["image/jpeg", "image/png", "image/webp", "image/jpg"].includes(file.type)) {
       toast({ title: "Only JPG/PNG/WEBP allowed", variant: "destructive" }); return;
     }
@@ -267,8 +267,9 @@ const AdminDashboard = () => {
   // Tournament CRUD
   const resetTournamentForm = () => { setTName(""); setTType("league"); setTSeason("S1"); setTYear(new Date().getFullYear()); setEditingTournament(null); };
   const addTournament = async () => {
-    if (!tName) return;
-    await supabase.from("tournaments").insert({ name: tName, type: tType, season: tSeason, year: tYear });
+    if (!tName) { toast({ title: "Tournament name is required", variant: "destructive" }); return; }
+    const { error } = await supabase.from("tournaments").insert({ name: tName, type: tType, season: tSeason, year: tYear });
+    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
     toast({ title: "Tournament Created!" }); resetTournamentForm(); loadTournaments();
   };
   const updateTournament = async (id: string) => {
@@ -462,7 +463,7 @@ const AdminDashboard = () => {
                 </div>
                 {/* Photo upload */}
                 <div className="mt-3">
-                  <label className="text-xs text-muted-foreground mb-1 block">Player Photo (JPG/PNG/WEBP, max 10MB)</label>
+                  <label className="text-xs text-muted-foreground mb-1 block">Player Photo (JPG/PNG/WEBP, max 2MB)</label>
                   <div className="flex items-center gap-4">
                     <input ref={photoInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePhotoSelect} className="text-sm text-foreground" />
                     {playerPhotoPreview && (
@@ -802,18 +803,7 @@ const AdminDashboard = () => {
 
           {/* ===== LOGOS ===== */}
           {activeTab === "logos" && isMainAdmin && (
-            <div className="space-y-6">
-              <h2 className="font-heading text-xl font-bold text-foreground">LOGO MANAGEMENT</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {["Website Logo", "Club Logo", "Main Team Logo", "Academy Team Logo", "Youth Team Logo", "TTS League Logo", "TTS Champions League Logo", "TTS Trophy Logo"].map(name => (
-                  <div key={name} className="bg-card border border-border rounded-lg p-4 text-center">
-                    <Image className="w-10 h-10 mx-auto text-muted-foreground mb-2" />
-                    <p className="font-heading text-sm font-bold text-foreground">{name}</p>
-                    <p className="text-xs text-muted-foreground mt-1">Upload feature coming soon</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <LogoManagement toast={toast} />
           )}
 
           {/* ===== FIXTURE (Inactive) ===== */}
