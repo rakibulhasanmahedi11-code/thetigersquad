@@ -342,15 +342,18 @@ const AdminDashboard = () => {
   };
 
   // Tournament CRUD
+  const typeLabels: Record<string, string> = { league: "TTS League", champions_league: "TTS Champions League", trophy: "TTS Trophy" };
+  const getAutoName = (type: string, season: string, year: number) => `${typeLabels[type] || type} - ${season} (${year})`;
   const resetTournamentForm = () => { setTName(""); setTType("league"); setTSeason("S1"); setTYear(new Date().getFullYear()); setEditingTournament(null); };
   const addTournament = async () => {
-    if (!tName) { toast({ title: "Tournament name is required", variant: "destructive" }); return; }
-    const { error } = await supabase.from("tournaments").insert({ name: tName, type: tType, season: tSeason, year: tYear });
+    const autoName = getAutoName(tType, tSeason, tYear);
+    const { error } = await supabase.from("tournaments").insert({ name: autoName, type: tType, season: tSeason, year: tYear });
     if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
     toast({ title: "Tournament Created!" }); resetTournamentForm(); loadTournaments();
   };
   const updateTournament = async (id: string) => {
-    await supabase.from("tournaments").update({ name: tName, type: tType, season: tSeason, year: tYear }).eq("id", id);
+    const autoName = editingTournament ? getAutoName(tType, tSeason, tYear) : tName;
+    await supabase.from("tournaments").update({ name: autoName, type: tType, season: tSeason, year: tYear }).eq("id", id);
     toast({ title: "Tournament Updated!" }); resetTournamentForm(); loadTournaments();
   };
   const deleteTournament = async (id: string) => {
@@ -651,20 +654,20 @@ const AdminDashboard = () => {
                 <h3 className="font-heading text-sm font-bold text-foreground mb-3">
                   {editingTournament ? "EDIT TOURNAMENT" : "CREATE TOURNAMENT"}
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                  <Input placeholder="Tournament Name" value={tName} onChange={e => setTName(e.target.value)} />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <select value={tType} onChange={e => setTType(e.target.value)} className="bg-background border border-input rounded-md px-3 py-2 text-sm text-foreground">
                     <option value="league">TTS League</option>
                     <option value="champions_league">TTS Champions League</option>
                     <option value="trophy">TTS Trophy</option>
                   </select>
                   <select value={tSeason} onChange={e => setTSeason(e.target.value)} className="bg-background border border-input rounded-md px-3 py-2 text-sm text-foreground">
-                    <option value="S1">Season 1</option>
-                    <option value="S2">Season 2</option>
-                    <option value="S3">Season 3</option>
+                    {Array.from({ length: 12 }, (_, i) => `S${i + 1}`).map(s => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
                   </select>
                   <Input type="number" placeholder="Year" value={tYear} onChange={e => setTYear(parseInt(e.target.value) || 2026)} />
                 </div>
+                <p className="text-xs text-muted-foreground mt-2">Auto Name: <span className="text-primary font-bold">{getAutoName(tType, tSeason, tYear)}</span></p>
                 <div className="mt-3 flex gap-2">
                   {editingTournament ? (
                     <>
@@ -858,11 +861,15 @@ const AdminDashboard = () => {
               <div className="bg-card border border-border rounded-lg p-4 space-y-4">
                 <div>
                   <label className="text-xs text-muted-foreground">Page Link</label>
-                  <Input value={ciPageLink} onChange={e => setCiPageLink(e.target.value)} />
+                  <Input value={ciPageLink} onChange={e => setCiPageLink(e.target.value)} placeholder="https://facebook.com/..." />
                 </div>
                 <div>
                   <label className="text-xs text-muted-foreground">Group Link</label>
-                  <Input value={ciGroupLink} onChange={e => setCiGroupLink(e.target.value)} />
+                  <Input value={ciGroupLink} onChange={e => setCiGroupLink(e.target.value)} placeholder="https://facebook.com/groups/..." />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground">Support Desk Link</label>
+                  <Input value={ciSupportDesk} onChange={e => setCiSupportDesk(e.target.value)} placeholder="https://..." />
                 </div>
                 <div>
                   <label className="text-xs text-muted-foreground">Club Created</label>

@@ -29,9 +29,12 @@ const FooterSection = () => {
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-border text-center">
+        <div className="mt-8 pt-6 border-t border-border text-center space-y-1">
           <p className="text-xs text-muted-foreground">
-            © 2025 The Tiger Squad Football Club. All rights reserved.
+            © 2026 The Tiger Squad Football Club. All rights reserved.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Website Created & Designed by <span className="text-primary font-bold">MAHEDI HASAN</span>
           </p>
         </div>
       </div>

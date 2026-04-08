@@ -2,8 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
-import OverallRankingSection from "@/components/OverallRankingSection";
-import LiveDrawSection from "@/components/LiveDrawSection";
 import FooterSection from "@/components/FooterSection";
 
 const Index = () => {
@@ -25,8 +23,6 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <HeroSection />
-      <OverallRankingSection />
-      <LiveDrawSection />
 
       {/* Info Section */}
       <section className="py-16 bg-dark-surface">
