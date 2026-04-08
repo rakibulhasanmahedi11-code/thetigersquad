@@ -52,6 +52,19 @@ const ClubInfoPage = () => {
                 </div>
               </div>
               <div className="flex items-center gap-3">
+                <Globe className="w-5 h-5 text-primary" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Support Desk</p>
+                  {clubInfo.support_desk ? (
+                    <a href={clubInfo.support_desk.startsWith("http") ? clubInfo.support_desk : `https://${clubInfo.support_desk}`} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
+                      Support Desk
+                    </a>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">No Link Available</span>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
                 <Calendar className="w-5 h-5 text-primary" />
                 <div>
                   <p className="text-xs text-muted-foreground">Club Created</p>

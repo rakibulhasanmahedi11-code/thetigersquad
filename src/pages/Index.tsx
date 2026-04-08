@@ -2,8 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
-import OverallRankingSection from "@/components/OverallRankingSection";
-import LiveDrawSection from "@/components/LiveDrawSection";
 import FooterSection from "@/components/FooterSection";
 
 const Index = () => {
@@ -19,14 +17,13 @@ const Index = () => {
 
   const pageLink = clubInfo.page_link || "";
   const groupLink = clubInfo.group_link || "";
+  const supportDesk = clubInfo.support_desk || "";
   const clubCreated = clubInfo.club_created || "2024";
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <HeroSection />
-      <OverallRankingSection />
-      <LiveDrawSection />
 
       {/* Info Section */}
       <section className="py-16 bg-dark-surface">
@@ -51,6 +48,16 @@ const Index = () => {
                 {groupLink ? (
                   <a href={groupLink.startsWith("http") ? groupLink : `https://${groupLink}`} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
                     Join Group
+                  </a>
+                ) : (
+                  <span className="text-sm text-muted-foreground">No Link Available</span>
+                )}
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Support Desk</span>
+                {supportDesk ? (
+                  <a href={supportDesk.startsWith("http") ? supportDesk : `https://${supportDesk}`} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
+                    Support Desk
                   </a>
                 ) : (
                   <span className="text-sm text-muted-foreground">No Link Available</span>
