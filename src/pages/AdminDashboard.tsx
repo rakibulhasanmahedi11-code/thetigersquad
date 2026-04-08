@@ -187,6 +187,7 @@ const AdminDashboard = () => {
   const [ciPageLink, setCiPageLink] = useState("");
   const [ciGroupLink, setCiGroupLink] = useState("");
   const [ciClubCreated, setCiClubCreated] = useState("");
+  const [ciSupportDesk, setCiSupportDesk] = useState("");
 
   // My permissions (club admin)
   const [myPermissions, setMyPermissions] = useState<AdminPermission | null>(null);
@@ -244,6 +245,7 @@ const AdminDashboard = () => {
       setCiPageLink(map.page_link || "");
       setCiGroupLink(map.group_link || "");
       setCiClubCreated(map.club_created || "");
+      setCiSupportDesk(map.support_desk || "");
     }
   };
 
@@ -393,6 +395,7 @@ const AdminDashboard = () => {
       { key: "page_link", value: ciPageLink },
       { key: "group_link", value: ciGroupLink },
       { key: "club_created", value: ciClubCreated },
+      { key: "support_desk", value: ciSupportDesk },
     ];
     for (const e of entries) {
       const { data } = await supabase.from("club_info").select("id").eq("key", e.key).single();
