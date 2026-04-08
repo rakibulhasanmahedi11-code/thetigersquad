@@ -54,6 +54,16 @@ const Index = () => {
                 )}
               </div>
               <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Support Desk</span>
+                {supportDesk ? (
+                  <a href={supportDesk.startsWith("http") ? supportDesk : `https://${supportDesk}`} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
+                    Support Desk
+                  </a>
+                ) : (
+                  <span className="text-sm text-muted-foreground">No Link Available</span>
+                )}
+              </div>
+              <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Club Created</span>
                 <span className="text-sm text-foreground font-bold">{clubCreated}</span>
               </div>
