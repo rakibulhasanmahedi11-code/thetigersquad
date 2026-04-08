@@ -55,75 +55,102 @@ interface RuleItem {
 }
 
 // Logo Management Component
+const logoConfigs = [
+  { label: "Club Logo", key: "logo_club" },
+  { label: "Main Team Logo", key: "logo_main_team" },
+  { label: "Academy Team Logo", key: "logo_academy_team" },
+  { label: "Youth Team Logo", key: "logo_youth_team" },
+  { label: "TTS League Logo", key: "logo_league" },
+  { label: "TTS Champions League Logo", key: "logo_champions_league" },
+  { label: "TTS Trophy Logo", key: "logo_trophy" },
+];
+
 const LogoManagement = ({ toast }: { toast: any }) => {
-  const logoTypes = ["Website Logo", "Club Logo", "Main Team Logo", "Academy Team Logo", "Youth Team Logo"];
   const [logos, setLogos] = useState<Record<string, string>>({});
+  const [uploading, setUploading] = useState<string | null>(null);
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   useEffect(() => {
-    const saved = localStorage.getItem("clubLogos");
-    if (saved) setLogos(JSON.parse(saved));
+    loadLogos();
   }, []);
 
-  const handleLogoUpload = (name: string, e: React.ChangeEvent<HTMLInputElement>) => {
+  const loadLogos = async () => {
+    const keys = logoConfigs.map(c => c.key);
+    const { data } = await supabase.from("club_info").select("key, value").in("key", keys);
+    const map: Record<string, string> = {};
+    data?.forEach((r: any) => { if (r.value) map[r.key] = r.value; });
+    setLogos(map);
+  };
+
+  const handleLogoUpload = async (key: string, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 2 * 1024 * 1024) { toast({ title: "File size must be under 2MB", variant: "destructive" }); return; }
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) { toast({ title: "Only JPG/PNG/WEBP allowed", variant: "destructive" }); return; }
-    const reader = new FileReader();
-    reader.onload = () => {
-      const url = reader.result as string;
-      setLogos(prev => {
-        const updated = { ...prev, [name]: url };
-        localStorage.setItem("clubLogos", JSON.stringify(updated));
-        return updated;
-      });
-      toast({ title: `${name} uploaded!` });
-    };
-    reader.readAsDataURL(file);
+
+    setUploading(key);
+    const ext = file.name.split(".").pop();
+    const path = `${key}.${ext}`;
+    const { error } = await supabase.storage.from("logos").upload(path, file, { upsert: true });
+    if (error) { toast({ title: "Upload failed", description: error.message, variant: "destructive" }); setUploading(null); return; }
+    const { data: urlData } = supabase.storage.from("logos").getPublicUrl(path);
+    const url = urlData.publicUrl + "?t=" + Date.now();
+
+    // Save URL to club_info
+    const { data: existing } = await supabase.from("club_info").select("id").eq("key", key).single();
+    if (existing) {
+      await supabase.from("club_info").update({ value: url }).eq("key", key);
+    } else {
+      await supabase.from("club_info").insert({ key, value: url });
+    }
+
+    setLogos(prev => ({ ...prev, [key]: url }));
+    setUploading(null);
+    toast({ title: "Logo uploaded!" });
   };
 
-  const removeLogo = (name: string) => {
-    setLogos(prev => {
-      const updated = { ...prev };
-      delete updated[name];
-      localStorage.setItem("clubLogos", JSON.stringify(updated));
-      return updated;
-    });
-    if (inputRefs.current[name]) inputRefs.current[name]!.value = "";
-    toast({ title: `${name} removed` });
+  const removeLogo = async (key: string) => {
+    await supabase.from("club_info").update({ value: null }).eq("key", key);
+    setLogos(prev => { const u = { ...prev }; delete u[key]; return u; });
+    if (inputRefs.current[key]) inputRefs.current[key]!.value = "";
+    toast({ title: "Logo removed" });
   };
 
   return (
     <div className="space-y-6">
       <h2 className="font-heading text-xl font-bold text-foreground">LOGO MANAGEMENT</h2>
+      <p className="text-sm text-muted-foreground">Upload logos here. They will auto-update across the entire website.</p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {logoTypes.map(name => (
+        {logoConfigs.map(({ label, key }) => (
           <div
-            key={name}
+            key={key}
             className="bg-card border border-border rounded-lg p-4 text-center cursor-pointer hover:border-primary transition-colors"
-            onClick={() => inputRefs.current[name]?.click()}
+            onClick={() => !uploading && inputRefs.current[key]?.click()}
           >
             <input
-              ref={el => { inputRefs.current[name] = el; }}
+              ref={el => { inputRefs.current[key] = el; }}
               type="file"
               accept="image/jpeg,image/png,image/webp"
               className="hidden"
-              onChange={e => handleLogoUpload(name, e)}
+              onChange={e => handleLogoUpload(key, e)}
             />
-            {logos[name] ? (
+            {uploading === key ? (
+              <div className="w-20 h-20 mx-auto flex items-center justify-center mb-2">
+                <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : logos[key] ? (
               <div className="relative inline-block">
-                <img src={logos[name]} alt={name} className="w-20 h-20 mx-auto object-contain rounded-lg mb-2" />
+                <img src={logos[key]} alt={label} className="w-20 h-20 mx-auto object-contain rounded-lg mb-2" />
                 <button
-                  onClick={e => { e.stopPropagation(); removeLogo(name); }}
+                  onClick={e => { e.stopPropagation(); removeLogo(key); }}
                   className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold"
                 >×</button>
               </div>
             ) : (
               <Upload className="w-10 h-10 mx-auto text-muted-foreground mb-2" />
             )}
-            <p className="font-heading text-sm font-bold text-foreground">{name}</p>
-            <p className="text-xs text-muted-foreground mt-1">{logos[name] ? "Click to replace" : "Click to upload"}</p>
+            <p className="font-heading text-sm font-bold text-foreground">{label}</p>
+            <p className="text-xs text-muted-foreground mt-1">{logos[key] ? "Click to replace" : "Click to upload"}</p>
           </div>
         ))}
       </div>

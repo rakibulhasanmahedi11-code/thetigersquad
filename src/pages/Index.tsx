@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
-import HeroSection from "@/components/HeroSection";
 import FooterSection from "@/components/FooterSection";
+import { ExternalLink } from "lucide-react";
 
 const Index = () => {
   const { data: clubInfo = {} } = useQuery({
@@ -20,10 +20,12 @@ const Index = () => {
   const supportDesk = clubInfo.support_desk || "";
   const clubCreated = clubInfo.club_created || "2024";
 
+  const makeUrl = (link: string) => link.startsWith("http") ? link : `https://${link}`;
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <HeroSection />
+      <div className="pt-20" />
 
       {/* Info Section */}
       <section className="py-16 bg-dark-surface">
@@ -33,36 +35,41 @@ const Index = () => {
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-card border border-border rounded-lg p-6 space-y-4">
+              {/* Page Link */}
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Page Link</span>
                 {pageLink ? (
-                  <a href={pageLink.startsWith("http") ? pageLink : `https://${pageLink}`} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
-                    {pageLink}
+                  <a href={makeUrl(pageLink)} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm font-heading font-bold bg-primary text-primary-foreground px-4 py-1.5 rounded-md hover:bg-primary/90 transition-colors">
+                    <ExternalLink className="w-3.5 h-3.5" /> Join Page
                   </a>
                 ) : (
                   <span className="text-sm text-muted-foreground">No Link Available</span>
                 )}
               </div>
+              {/* Group Link */}
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Group Link</span>
                 {groupLink ? (
-                  <a href={groupLink.startsWith("http") ? groupLink : `https://${groupLink}`} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
-                    Join Group
+                  <a href={makeUrl(groupLink)} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm font-heading font-bold bg-primary text-primary-foreground px-4 py-1.5 rounded-md hover:bg-primary/90 transition-colors">
+                    <ExternalLink className="w-3.5 h-3.5" /> Join Group
                   </a>
                 ) : (
-                  <span className="text-sm text-muted-foreground">No Link Available</span>
+                  <span className="text-sm text-muted-foreground">Coming Soon</span>
                 )}
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Support Desk</span>
-                {supportDesk ? (
-                  <a href={supportDesk.startsWith("http") ? supportDesk : `https://${supportDesk}`} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
-                    Support Desk
+              {/* Support Desk */}
+              {supportDesk && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Support Desk</span>
+                  <a href={makeUrl(supportDesk)} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm font-heading font-bold bg-primary text-primary-foreground px-4 py-1.5 rounded-md hover:bg-primary/90 transition-colors">
+                    <ExternalLink className="w-3.5 h-3.5" /> Join Support Desk
                   </a>
-                ) : (
-                  <span className="text-sm text-muted-foreground">No Link Available</span>
-                )}
-              </div>
+                </div>
+              )}
+              {/* Club Created */}
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Club Created</span>
                 <span className="text-sm text-foreground font-bold">{clubCreated}</span>

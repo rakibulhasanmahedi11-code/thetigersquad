@@ -4,12 +4,19 @@ import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import FooterSection from "@/components/FooterSection";
 import { Trophy, Star, Award, Calendar } from "lucide-react";
+import { useLogos, LOGO_KEYS } from "@/hooks/use-logos";
 
 const typeIcons: Record<string, any> = { league: Trophy, champions_league: Star, trophy: Award };
 const typeColors: Record<string, string> = { league: "bg-primary", champions_league: "bg-accent", trophy: "bg-secondary" };
+const typeLogoKeys: Record<string, string> = {
+  league: LOGO_KEYS.league,
+  champions_league: LOGO_KEYS.champions_league,
+  trophy: LOGO_KEYS.trophy,
+};
 
 const TournamentPage = () => {
   const [selectedTournament, setSelectedTournament] = useState<string | null>(null);
+  const { data: logos = {} } = useLogos();
 
   const { data: tournaments = [] } = useQuery({
     queryKey: ["tournaments"],
@@ -29,6 +36,15 @@ const TournamentPage = () => {
     enabled: !!selectedTournament,
   });
 
+  const renderTournamentIcon = (type: string, size: string = "w-7 h-7") => {
+    const logoKey = typeLogoKeys[type];
+    if (logoKey && logos[logoKey]) {
+      return <img src={logos[logoKey]} alt={type} className={`${size} object-contain`} />;
+    }
+    const Icon = typeIcons[type] || Trophy;
+    return <Icon className={`${size} text-primary-foreground`} />;
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -37,44 +53,36 @@ const TournamentPage = () => {
           <h1 className="font-heading text-4xl md:text-5xl font-bold text-foreground mb-2">TOURNAMENTS</h1>
           <p className="text-muted-foreground text-sm mb-10 max-w-md">Compete in official TTS tournaments across multiple formats.</p>
 
-          {/* Tournament Cards */}
           <div className="grid md:grid-cols-3 gap-6 mb-12">
             {tournaments.length === 0 ? (
               <>
                 {[{ name: "TTS League", type: "league", desc: "Round-robin league format. Win = 3pts, Draw = 1pt." },
                   { name: "TTS Champions League", type: "champions_league", desc: "Group Stage + Knockout rounds with Live Draw." },
                   { name: "TTS Trophy", type: "trophy", desc: "Knockout cup competition for all teams." }
-                ].map(t => {
-                  const Icon = typeIcons[t.type] || Trophy;
-                  return (
-                    <div key={t.name} className="bg-card border border-border rounded-lg p-6 hover:border-primary transition-colors group">
-                      <div className={`w-14 h-14 ${typeColors[t.type]} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                        <Icon className="w-7 h-7 text-primary-foreground" />
-                      </div>
-                      <h3 className="font-heading text-xl font-bold text-foreground mb-2">{t.name}</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed mb-4">{t.desc}</p>
-                      <span className="inline-block text-xs font-heading tracking-wider text-primary bg-primary/10 px-3 py-1 rounded-full">Coming Soon</span>
+                ].map(t => (
+                  <div key={t.name} className="bg-card border border-border rounded-lg p-6 hover:border-primary transition-colors group">
+                    <div className={`w-14 h-14 ${typeColors[t.type]} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                      {renderTournamentIcon(t.type)}
                     </div>
-                  );
-                })}
-              </>
-            ) : tournaments.map((t: any) => {
-              const Icon = typeIcons[t.type] || Trophy;
-              return (
-                <div key={t.id} onClick={() => setSelectedTournament(t.id)}
-                  className={`bg-card border rounded-lg p-6 hover:border-primary transition-colors group cursor-pointer ${selectedTournament === t.id ? "border-primary" : "border-border"}`}>
-                  <div className={`w-14 h-14 ${typeColors[t.type] || "bg-primary"} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                    <Icon className="w-7 h-7 text-primary-foreground" />
+                    <h3 className="font-heading text-xl font-bold text-foreground mb-2">{t.name}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-4">{t.desc}</p>
+                    <span className="inline-block text-xs font-heading tracking-wider text-primary bg-primary/10 px-3 py-1 rounded-full">Coming Soon</span>
                   </div>
-                  <h3 className="font-heading text-xl font-bold text-foreground mb-2">{t.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-2">{t.season} • {t.year}</p>
-                  <span className="inline-block text-xs font-heading tracking-wider text-primary bg-primary/10 px-3 py-1 rounded-full">{t.status}</span>
+                ))}
+              </>
+            ) : tournaments.map((t: any) => (
+              <div key={t.id} onClick={() => setSelectedTournament(t.id)}
+                className={`bg-card border rounded-lg p-6 hover:border-primary transition-colors group cursor-pointer ${selectedTournament === t.id ? "border-primary" : "border-border"}`}>
+                <div className={`w-14 h-14 ${typeColors[t.type] || "bg-primary"} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                  {renderTournamentIcon(t.type)}
                 </div>
-              );
-            })}
+                <h3 className="font-heading text-xl font-bold text-foreground mb-2">{t.name}</h3>
+                <p className="text-sm text-muted-foreground mb-2">{t.season} • {t.year}</p>
+                <span className="inline-block text-xs font-heading tracking-wider text-primary bg-primary/10 px-3 py-1 rounded-full">{t.status}</span>
+              </div>
+            ))}
           </div>
 
-          {/* Scoreboard */}
           {selectedTournament && (
             <div className="bg-card border border-border rounded-lg overflow-hidden">
               <div className="p-4 border-b border-border">
@@ -118,7 +126,6 @@ const TournamentPage = () => {
             </div>
           )}
 
-          {/* Fixture placeholder */}
           <div className="mt-12 bg-card border border-border rounded-lg p-8 text-center">
             <Calendar className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
             <h3 className="font-heading text-xl font-bold text-foreground mb-2">FIXTURE</h3>

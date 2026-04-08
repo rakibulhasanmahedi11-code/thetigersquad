@@ -3,11 +3,12 @@ import { User, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { useLogos, LOGO_KEYS } from "@/hooks/use-logos";
 
 const teamOptions = [
-  { key: "main_team" as const, label: "MAIN TEAM" },
-  { key: "academy_team" as const, label: "ACADEMY TEAM" },
-  { key: "youth_team" as const, label: "YOUTH TEAM" },
+  { key: "main_team" as const, label: "MAIN TEAM", logoKey: LOGO_KEYS.main_team },
+  { key: "academy_team" as const, label: "ACADEMY TEAM", logoKey: LOGO_KEYS.academy_team },
+  { key: "youth_team" as const, label: "YOUTH TEAM", logoKey: LOGO_KEYS.youth_team },
 ];
 
 const teamDisplayName: Record<string, string> = {
@@ -29,6 +30,7 @@ const calcAge = (dob: string | null, fallbackAge: number): number => {
 const PlayerListSection = () => {
   const [selectedTeam, setSelectedTeam] = useState<"main_team" | "academy_team" | "youth_team" | null>(null);
   const navigate = useNavigate();
+  const { data: logos = {} } = useLogos();
 
   const { data: players = [], isLoading } = useQuery({
     queryKey: ["players", selectedTeam],
@@ -53,8 +55,14 @@ const PlayerListSection = () => {
             {teamOptions.map((team) => (
               <button key={team.key} onClick={() => setSelectedTeam(team.key)}
                 className="group bg-card border border-border rounded-xl p-8 hover:border-primary transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 text-left">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                  <User className="w-8 h-8 text-primary" />
+                <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 overflow-hidden border-2 border-border group-hover:border-primary transition-colors">
+                  {logos[team.logoKey] ? (
+                    <img src={logos[team.logoKey]} alt={team.label} className="w-full h-full object-contain" />
+                  ) : (
+                    <div className="w-full h-full bg-primary/10 flex items-center justify-center">
+                      <User className="w-8 h-8 text-primary" />
+                    </div>
+                  )}
                 </div>
                 <h3 className="font-heading text-xl font-bold text-foreground mb-2">{team.label}</h3>
                 <div className="flex items-center text-sm text-muted-foreground group-hover:text-primary transition-colors">
@@ -69,7 +77,8 @@ const PlayerListSection = () => {
               <button onClick={() => setSelectedTeam(null)} className="font-heading text-xs tracking-wider px-4 py-2 border border-border bg-transparent text-muted-foreground hover:border-primary transition-colors">← BACK</button>
               {teamOptions.map((team) => (
                 <button key={team.key} onClick={() => setSelectedTeam(team.key)}
-                  className={`font-heading text-xs tracking-wider px-4 py-2 border transition-colors ${selectedTeam === team.key ? "bg-primary text-primary-foreground border-primary" : "bg-transparent text-muted-foreground border-border hover:border-primary"}`}>
+                  className={`font-heading text-xs tracking-wider px-4 py-2 border transition-colors flex items-center gap-2 ${selectedTeam === team.key ? "bg-primary text-primary-foreground border-primary" : "bg-transparent text-muted-foreground border-border hover:border-primary"}`}>
+                  {logos[team.logoKey] && <img src={logos[team.logoKey]} alt="" className="w-4 h-4 object-contain" />}
                   {team.label}
                 </button>
               ))}
