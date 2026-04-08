@@ -17,6 +17,7 @@ const Index = () => {
 
   const pageLink = clubInfo.page_link || "";
   const groupLink = clubInfo.group_link || "";
+  const supportDesk = clubInfo.support_desk || "";
   const clubCreated = clubInfo.club_created || "2024";
 
   return (
